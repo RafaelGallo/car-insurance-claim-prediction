@@ -1,0 +1,40 @@
+services:
+  streamlit:
+    build:
+      context: .
+      dockerfile: docker/streamlit.Dockerfile
+    image: car-insurance-claim-app:latest
+    container_name: car_insurance_claim_app
+    ports:
+      - "8501:8501"
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_UI_URL: http://localhost:5000
+      MLFLOW_EXPERIMENT_NAME: car_insurance_claim
+    volumes:
+      - ./models:/srv/app/models
+      - ./output:/srv/app/output
+    depends_on:
+      - mlflow
+    networks:
+      - car_insurance_claim_net
+    restart: unless-stopped
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: docker/mlflow.Dockerfile
+    image: car-insurance-claim-mlflow:latest
+    container_name: car_insurance_claim_mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow/data:/mlflow/data
+      - ./mlflow/artifacts:/mlflow/artifacts
+    networks:
+      - car_insurance_claim_net
+    restart: unless-stopped
+
+networks:
+  car_insurance_claim_net:
+    name: car_insurance_claim_net

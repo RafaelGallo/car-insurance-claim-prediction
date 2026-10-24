@@ -1,0 +1,12 @@
+* text=auto
+
+*.pdf binary
+*.png binary
+*.jpg binary
+*.joblib binary
+*.pkl binary
+*.parquet binary
+*.db binary
+
+*.sh text eol=lf
+*.Dockerfile text eol=lf
