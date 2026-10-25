@@ -16,10 +16,10 @@ Uma seguradora precisa decidir, na emissão e renovação da apólice, qual a pr
 |---|---|
 | ![Desbalanceamento do alvo](img/output1.png) | **Alvo raro e desbalanceado.** Só 6,4% das apólices (3.748 de 58.592) acionam o seguro em 6 meses — qualquer modelo precisa lidar com essa assimetria (`class_weight="balanced"`, PR-AUC/recall em vez de acurácia bruta). |
 | ![Correlação geral](img/2output.png) | **Nada se correlaciona fortemente com o alvo.** `policy_tenure` (tempo de apólice) é a variável com maior correlação com `is_claim` (+0,08) — ainda assim fraca. As ~13 variáveis de porte/motor do veículo (`displacement`, `length`, `width`, `gross_weight`...) são fortemente correlacionadas **entre si** (até 0,96), mas quase 0 com o alvo: o risco não está no tamanho do carro. |
-| ![Tempo de apólice vs sinistro](img/4output.png) | **Tempo de apólice é o sinal mais forte.** Apólices "longas"/"muito longas" têm taxa de sinistro de 8,3–8,7%, mais que o dobro das "muito curtas" (3,6%) — por isso o Poisson GLM usa `policy_tenure` como exposição (offset). |
+| ![Tempo de apólice vs sinistro](img/4output.png) | **Tempo de apólice é o sinal mais forte.** Apólices "longas"/"muito longas" têm taxa de sinistro de 8,3–8,7%, mais que o dobro das "muito curtas" (3,6%) — por isso `policy_tenure` é a principal variável dos modelos GLM. |
 | ![Risco por região](img/5output.png) | **Risco varia por região.** Os clusters `C14`, `C4` e `C19` têm taxa de sinistro acima de 7,4% (vs. 6,4% da carteira) — candidato a fator de underwriting geográfico. |
 | ![Itens eletrônicos de segurança](img/6output.png) | **Itens de segurança não reduzem a taxa bruta.** Sensor de estacionamento, câmera de ré, assistente de freio, ESC e TPMS não diminuem (e às vezes aumentam ligeiramente) a taxa de sinistro bruta — não são, isoladamente, bons preditores de risco. |
-| ![Outliers nas variáveis numéricas](img/7output.png) | **Outliers tratados por z-score.** Boxplots mostram caudas longas em `age_of_car`, `age_of_policyholder` e `population_density`; o tratamento (`data/train_tratado_zscore.csv`) limita extremos a 3 desvios-padrão sem remover apólices, guardando a informação original em colunas `_outlier`. |
+| ![Outliers nas variáveis numéricas](img/7output.png) | **Outliers tratados por z-score.** Boxplots mostram caudas longas em `age_of_car`, `age_of_policyholder` e `population_density`; o tratamento (`data/train_tratado_zscore.csv`) limita extremos a 3 desvios-padrão sem remover apólices. |
 
 ## Abordagem estatística (GLM / Poisson)
 
