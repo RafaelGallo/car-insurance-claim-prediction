@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -114,12 +115,27 @@ with tab_predict:
                     col2.metric("Sinalizadas como sinistro", n_flagged)
                     col3.metric("Taxa sinalizada", f"{n_flagged / n_rows:.1%}" if n_rows else "—")
 
-                    st.bar_chart(result["claim_probability"], height=200)
-                    st.dataframe(result, use_container_width=True, height=400)
+                    # histogram, not one bar per row: a 39k-row CSV would draw 39k bars and freeze the page
+                    contagens, bordas = np.histogram(result["claim_probability"], bins=20, range=(0.0, 1.0))
+                    histograma = pd.DataFrame(
+                        {"apolices": contagens},
+                        index=pd.Index([f"{b:.2f}" for b in bordas[:-1]], name="probabilidade de sinistro"),
+                    )
+                    st.bar_chart(histograma, height=220, x_label="probabilidade de sinistro", y_label="apólices")
+                    st.caption(
+                        f"Quantas apólices caem em cada faixa de probabilidade; a partir de {threshold:.2f} "
+                        "a apólice é sinalizada como sinistro."
+                    )
+
+                    primeiras = [c for c in ("policy_id", "claim_probability", "claim_prediction") if c in result.columns]
+                    vista = result[primeiras + [c for c in result.columns if c not in primeiras]].sort_values(
+                        "claim_probability", ascending=False
+                    )
+                    st.dataframe(vista, use_container_width=True, height=400)
 
                     st.download_button(
                         "⬇️ Baixar previsões (CSV)",
-                        data=result.to_csv(index=False).encode("utf-8"),
+                        data=vista.to_csv(index=False).encode("utf-8"),
                         file_name=f"predictions_{model_name.replace(' ', '_')}.csv",
                         mime="text/csv",
                     )
