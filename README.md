@@ -120,13 +120,13 @@ The full before/after comparison is in `output/comparativo_glm.csv`.
 ## MLOps architecture
 
 ```mermaid
-flowchart LR
+flowchart TD
     U["User"] -->|"CSV / parquet"| S["Streamlit app (8501)<br/>model picker + batch scoring"]
-    S -->|"logs inference runs"| M["MLflow (5000)<br/>tracking + model registry"]
-    A["Airflow (8080)<br/>weekly retraining DAG"] -->|"logs training runs"| M
+    D["data/raw (new batches)"] --> A["Airflow (8080)<br/>weekly retraining DAG"]
     A -->|"writes models/*.joblib"| R["models/"]
-    R --> S
-    D["data/raw (new batches)"] --> A
+    R -->|"loads"| S
+    S -->|"logs inference runs"| M["MLflow (5000)<br/>tracking + model registry"]
+    A -->|"logs training runs"| M
 ```
 
 - **`car_insurance_claim/`** — Python package shared by every component: `modeling/predict.py` (inference: loads `models/`, applies the same `LabelEncoder`s used in training, maps unseen categories, applies the business threshold), `modeling/train.py` (retrains the 10 models and logs them to MLflow; called by Airflow) and `mlops/` (MLflow helpers, historical-metrics backfill and the PDF report generator).
