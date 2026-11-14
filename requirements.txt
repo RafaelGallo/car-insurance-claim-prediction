@@ -84,7 +84,7 @@ nbconvert==7.17.2
 nbformat==5.11.1
 nest-asyncio2==1.7.4
 numpy==2.5.4
-opentelemetry-api==1.45.1
+opentelemetry-api==1.45.2
 opentelemetry-proto==1.45.1
 opentelemetry-sdk==1.45.1
 opentelemetry-semantic-conventions==0.66b1
